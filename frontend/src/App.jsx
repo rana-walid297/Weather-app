@@ -2,23 +2,66 @@
 import { useState } from "react";
 import "./App.css";
 
+const CITIES = [
+  "Cairo",
+  "Alexandria",
+  "Giza",
+  "London",
+  "Paris",
+  "Berlin",
+  "Rome",
+  "Madrid",
+  "New York",
+  "Los Angeles",
+  "Chicago",
+  "Toronto",
+  "Dubai",
+  "Abu Dhabi",
+  "Doha",
+  "Riyadh",
+  "Istanbul",
+  "Tokyo",
+  "Seoul",
+  "Singapore",
+  "Sydney",
+  "Melbourne",
+  "Mumbai",
+  "Delhi",
+  "Bangkok",
+  "Amsterdam",
+  "Vienna",
+  "Athens",
+  "Lisbon",
+  "Barcelona"
+];
+
 const COMPASS_POINTS = [
-  "N", "NNE", "NE", "ENE",
-  "E", "ESE", "SE", "SSE",
-  "S", "SSW", "SW", "WSW",
-  "W", "WNW", "NW", "NNW"
+  "N",
+  "NNE",
+  "NE",
+  "ENE",
+  "E",
+  "ESE",
+  "SE",
+  "SSE",
+  "S",
+  "SSW",
+  "SW",
+  "WSW",
+  "W",
+  "WNW",
+  "NW",
+  "NNW"
 ];
 
 function degToCompass(deg) {
   return COMPASS_POINTS[Math.round(deg / 22.5) % 16];
 }
 
-function unixToTime(ts) {
-  if (!ts) return "—";
+function unixToTime(timestamp) {
+  if (!timestamp) return "—";
 
-  const date = new Date(ts * 1000);
-
-  return date.toLocaleTimeString([], {
+  return new Date(timestamp * 1000).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit"
   });
@@ -26,125 +69,43 @@ function unixToTime(ts) {
 
 function metersToKm(meters) {
   if (!meters) return "—";
+
   return (meters / 1000).toFixed(1);
 }
 
 function WeatherIcon({ condition }) {
   if (condition === "Clear") {
     return (
-      <svg className="weather-icon" viewBox="0 0 64 64">
-        <circle cx="32" cy="32" r="12" fill="#C9A24B" />
-
-        <g
-          stroke="#C9A24B"
-          strokeWidth="3"
-          strokeLinecap="round"
-        >
-          <line x1="32" y1="4" x2="32" y2="12" />
-          <line x1="32" y1="52" x2="32" y2="60" />
-          <line x1="4" y1="32" x2="12" y2="32" />
-          <line x1="52" y1="32" x2="60" y2="32" />
-
-          <line x1="12" y1="12" x2="17.5" y2="17.5" />
-          <line x1="46.5" y1="46.5" x2="52" y2="52" />
-
-          <line x1="52" y1="12" x2="46.5" y2="17.5" />
-          <line x1="17.5" y1="46.5" x2="12" y2="52" />
-        </g>
-      </svg>
+      <div className="weather-symbol sun-symbol">
+        ☀
+      </div>
     );
   }
 
-  if (condition === "Rain") {
+  if (
+    condition === "Rain" ||
+    condition === "Drizzle"
+  ) {
     return (
-      <svg className="weather-icon" viewBox="0 0 64 64">
-        <ellipse
-          cx="30"
-          cy="26"
-          rx="16"
-          ry="10"
-          fill="#74B7C4"
-        />
-
-        <g
-          stroke="#74B7C4"
-          strokeWidth="3"
-          strokeLinecap="round"
-        >
-          <line x1="20" y1="42" x2="17" y2="52" />
-          <line x1="32" y1="42" x2="29" y2="52" />
-          <line x1="44" y1="42" x2="41" y2="52" />
-        </g>
-      </svg>
-    );
-  }
-
-  if (condition === "Drizzle") {
-    return (
-      <svg className="weather-icon" viewBox="0 0 64 64">
-        <ellipse
-          cx="30"
-          cy="26"
-          rx="15"
-          ry="9"
-          fill="#8FA3B8"
-        />
-
-        <g
-          stroke="#74B7C4"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        >
-          <line x1="22" y1="40" x2="20" y2="47" />
-          <line x1="32" y1="40" x2="30" y2="47" />
-          <line x1="42" y1="40" x2="40" y2="47" />
-        </g>
-      </svg>
+      <div className="weather-symbol rain-symbol">
+        🌧
+      </div>
     );
   }
 
   if (condition === "Thunderstorm") {
     return (
-      <svg className="weather-icon" viewBox="0 0 64 64">
-        <ellipse
-          cx="30"
-          cy="24"
-          rx="16"
-          ry="9"
-          fill="#536278"
-        />
-
-        <polygon
-          points="30,34 24,48 30,48 26,60 40,42 32,42 36,34"
-          fill="#C9A24B"
-        />
-      </svg>
+      <div className="weather-symbol storm-symbol">
+        ⛈
+      </div>
     );
   }
 
   if (condition === "Snow") {
     return (
-      <svg className="weather-icon" viewBox="0 0 64 64">
-        <ellipse
-          cx="30"
-          cy="24"
-          rx="15"
-          ry="9"
-          fill="#8FA3B8"
-        />
-
-        <g
-          stroke="#EDE6D6"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        >
-          <line x1="20" y1="42" x2="20" y2="52" />
-          <line x1="15.5" y1="47" x2="24.5" y2="47" />
-
-          <line x1="40" y1="42" x2="40" y2="52" />
-          <line x1="35.5" y1="47" x2="44.5" y2="47" />
-        </g>
-      </svg>
+      <div className="weather-symbol snow-symbol">
+        ❄
+      </div>
     );
   }
 
@@ -154,156 +115,77 @@ function WeatherIcon({ condition }) {
     condition === "Haze"
   ) {
     return (
-      <svg className="weather-icon" viewBox="0 0 64 64">
-        <g
-          stroke="#8FA3B8"
-          strokeWidth="3"
-          strokeLinecap="round"
-        >
-          <line x1="10" y1="24" x2="54" y2="24" />
-          <line x1="16" y1="34" x2="48" y2="34" />
-          <line x1="10" y1="44" x2="54" y2="44" />
-        </g>
-      </svg>
+      <div className="weather-symbol">
+        ≋
+      </div>
     );
   }
 
-  // Clouds and any unknown condition
   return (
-    <svg className="weather-icon" viewBox="0 0 64 64">
-      <ellipse
-        cx="26"
-        cy="38"
-        rx="16"
-        ry="11"
-        fill="#74B7C4"
-      />
-      <ellipse
-        cx="40"
-        cy="32"
-        rx="13"
-        ry="10"
-        fill="#8FA3B8"
-      />
-    </svg>
+    <div className="weather-symbol cloud-symbol">
+      ☁
+    </div>
   );
 }
 
-function Gauge({ value, fraction, unit, colorClass = "" }) {
-  const circumference = 2 * Math.PI * 36;
+function Gauge({
+  value,
+  unit,
+  fraction,
+  color
+}) {
+  const radius = 38;
+  const circumference = 2 * Math.PI * radius;
 
   const safeFraction = Math.max(
     0,
-    Math.min(1, fraction)
+    Math.min(1, fraction || 0)
   );
 
   const offset =
-    circumference - safeFraction * circumference;
+    circumference -
+    safeFraction * circumference;
 
   return (
-    <>
-      <svg width="88" height="88" viewBox="0 0 88 88">
+    <div className="gauge">
+      <svg viewBox="0 0 96 96">
         <circle
-          cx="44"
-          cy="44"
-          r="36"
-          className="ring-bg"
-          strokeWidth="7"
+          cx="48"
+          cy="48"
+          r={radius}
+          className="gauge-background"
         />
 
         <circle
-          cx="44"
-          cy="44"
-          r="36"
-          className={`ring-fg ${colorClass}`}
-          strokeWidth="7"
-          transform="rotate(-90 44 44)"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          cx="48"
+          cy="48"
+          r={radius}
+          className="gauge-progress"
+          style={{
+            stroke: color,
+            strokeDasharray: circumference,
+            strokeDashoffset: offset
+          }}
         />
       </svg>
 
-      <div className="gauge-readout">
-        {value} <small>{unit}</small>
+      <div className="gauge-center">
+        <strong>{value}</strong>
+        <span>{unit}</span>
       </div>
-    </>
-  );
-}
-
-function SunArc({ sunrise, sunset }) {
-  const now = Date.now() / 1000;
-
-  const fraction =
-    sunrise && sunset
-      ? Math.max(
-          0,
-          Math.min(1, (now - sunrise) / (sunset - sunrise))
-        )
-      : 0.5;
-
-  const cx = 130;
-  const cy = 130;
-  const r = 100;
-
-  const angle = Math.PI * (1 - fraction);
-
-  const sunX = cx + r * Math.cos(angle);
-  const sunY = cy - r * Math.sin(angle);
-
-  return (
-    <svg
-      className="sun-arc"
-      viewBox="0 0 260 150"
-    >
-      <path
-        d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${
-          cx + r
-        } ${cy}`}
-        fill="none"
-        stroke="#2A3F58"
-        strokeWidth="1.5"
-        strokeDasharray="3 4"
-      />
-
-      <line
-        x1={cx - r - 8}
-        y1={cy}
-        x2={cx + r + 8}
-        y2={cy}
-        stroke="#2A3F58"
-        strokeWidth="1"
-      />
-
-      <circle
-        cx={sunX}
-        cy={sunY}
-        r="7"
-        fill="#C9A24B"
-      />
-
-      <circle
-        cx={cx - r}
-        cy={cy}
-        r="3"
-        fill="#74B7C4"
-      />
-
-      <circle
-        cx={cx + r}
-        cy={cy}
-        r="3"
-        fill="#D9784F"
-      />
-    </svg>
+    </div>
   );
 }
 
 function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
+
   const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(false);
 
+  // Search for a city
   const getWeather = async () => {
     const trimmedCity = city.trim();
 
@@ -323,20 +205,82 @@ function App() {
       );
 
       if (!response.ok) {
-        throw new Error("Unable to fetch weather.");
+        throw new Error(
+          "Weather could not be found."
+        );
       }
 
       const data = await response.json();
 
       setWeather(data);
-    } catch (err) {
+    } catch (error) {
       setWeather(null);
+
       setError(
-        "Could not fetch weather. Check the city name and make sure the backend is running."
+        "We couldn't find that city. Please check the spelling and try again."
       );
     } finally {
       setLoading(false);
     }
+  };
+
+  // Get weather for user's location
+  const getMyLocation = () => {
+    if (!navigator.geolocation) {
+      setError(
+        "Your browser does not support location."
+      );
+
+      return;
+    }
+
+    setCity("");
+    setLoading(true);
+    setError("");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const {
+          latitude,
+          longitude
+        } = position.coords;
+
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/weather?lat=${latitude}&lon=${longitude}`
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              "Could not get weather."
+            );
+          }
+
+          const data = await response.json();
+
+          setWeather(data);
+
+          // Put detected city in search box
+          setCity(data.city);
+        } catch (error) {
+          setWeather(null);
+
+          setError(
+            "Could not get weather for your location."
+          );
+        } finally {
+          setLoading(false);
+        }
+      },
+
+      () => {
+        setLoading(false);
+
+        setError(
+          "Location permission was denied. Please allow location access."
+        );
+      }
+    );
   };
 
   const handleKeyDown = (event) => {
@@ -346,376 +290,469 @@ function App() {
   };
 
   const pressureFraction = weather
-    ? (weather.pressure - 980) / (1050 - 980)
+    ? (weather.pressure - 980) / 70
     : 0;
 
   const visibilityFraction = weather
-    ? weather.visibility / 10000
+    ? Math.min(weather.visibility / 10000, 1)
     : 0;
 
   return (
-    <div className="station">
-      {/* HEADER */}
-      <div className="masthead">
-        <div>
-          <div className="masthead-label">
-            Field Station Readout
-          </div>
+    <main className="app">
+      <div className="weather-container">
 
-          <h1>
-            {weather ? weather.city : "Weather Station"}
+        {/* HEADER */}
 
-            {weather && (
-              <span>{weather.country}</span>
-            )}
-          </h1>
-        </div>
+        <header className="top-bar">
 
-        <div className="search">
-          <input
-            type="text"
-            placeholder="Search city..."
-            value={city}
-            onChange={(event) =>
-              setCity(event.target.value)
-            }
-            onKeyDown={handleKeyDown}
-          />
+          <div className="brand">
 
-          <button
-            onClick={getWeather}
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Fetch"}
-          </button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
-
-      {/* HERO */}
-      <div className="hero">
-        {/* TEMPERATURE PANEL */}
-        <div className="panel">
-          <div className="panel-title">
-            Temperature
-          </div>
-
-          <div className="reading">
-            <div>
-              <div className="temp-big">
-                {weather
-                  ? Math.round(weather.temperature)
-                  : "—"}
-
-                <sup>°C</sup>
-              </div>
+            <div className="brand-icon">
+              ☼
             </div>
+
+            <div>
+              <h1>Weatherly</h1>
+
+              <p>
+                Simple weather, wherever you are.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="search-area">
+
+            <div className="search-box">
+
+              <span className="search-icon">
+                ⌕
+              </span>
+
+              <input
+                list="city-list"
+                type="text"
+                placeholder="Search for a city..."
+                value={city}
+                onChange={(event) =>
+                  setCity(event.target.value)
+                }
+                onKeyDown={handleKeyDown}
+              />
+
+              <datalist id="city-list">
+                {CITIES.map((cityName) => (
+                  <option
+                    key={cityName}
+                    value={cityName}
+                  />
+                ))}
+              </datalist>
+
+              <button
+                onClick={getWeather}
+                disabled={loading}
+              >
+                {loading
+                  ? "..."
+                  : "Search"}
+              </button>
+
+            </div>
+
+            <button
+              className="location-button"
+              onClick={getMyLocation}
+              disabled={loading}
+            >
+              {loading
+                ? "Finding you..."
+                : "📍 Use my location"}
+            </button>
+
+          </div>
+
+        </header>
+
+
+        {/* ERROR */}
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+
+        {/* MAIN WEATHER */}
+
+        <section className="weather-main">
+
+          <div className="location">
+
+            <span className="location-pin">
+              ●
+            </span>
+
+            {weather ? (
+              <>
+                <strong>
+                  {weather.city}
+                </strong>
+
+                <span>
+                  {weather.country}
+                </span>
+              </>
+            ) : (
+              <span>
+                Search for a city
+              </span>
+            )}
+
+          </div>
+
+
+          <div className="temperature-section">
 
             {weather && (
               <WeatherIcon
                 condition={weather.condition}
               />
             )}
-          </div>
 
-          <div className="condition-row">
+            <div className="temperature">
+
+              {weather
+                ? Math.round(
+                    weather.temperature
+                  )
+                : "—"}
+
+              <span>
+                °C
+              </span>
+
+            </div>
+
+
             <div className="condition">
+
               {weather
                 ? weather.condition
-                : "—"}
+                : "Your weather awaits"}
+
             </div>
 
-            <div className="description">
+
+            <p className="description">
+
               {weather
                 ? weather.description
-                : "Search for a city to begin"}
-            </div>
+                : "Enter a city above to see the current conditions."}
+
+            </p>
+
+
+            {weather && (
+              <div className="feels-like">
+
+                Feels like{" "}
+
+                <strong>
+                  {Math.round(
+                    weather.feelsLike
+                  )}
+                  °
+                </strong>
+
+              </div>
+            )}
+
           </div>
 
-          <div className="sub-readings">
-            <div>
-              <span className="sub-label">
-                Feels Like
+
+          {/* TEMPERATURE RANGE */}
+
+          {weather && (
+            <div className="temperature-range">
+
+              <span>
+                {Math.round(
+                  weather.minTemperature
+                )}°
               </span>
 
-              <span className="sub-value">
-                {weather
-                  ? `${Math.round(
-                      weather.feelsLike
-                    )}°`
-                  : "—"}
+              <div className="temperature-line">
+                <div />
+              </div>
+
+              <span>
+                {Math.round(
+                  weather.maxTemperature
+                )}°
               </span>
+
             </div>
+          )}
 
-            <div>
-              <span className="sub-label">
+        </section>
+
+
+        {/* WEATHER DETAILS */}
+
+        <section className="details-section">
+
+          <div className="section-heading">
+            <span>
+              Today's conditions
+            </span>
+          </div>
+
+
+          <div className="detail-grid">
+
+            {/* HUMIDITY */}
+
+            <div className="detail-card">
+
+              <div className="card-label">
                 Humidity
-              </span>
+              </div>
 
-              <span className="sub-value">
-                {weather
-                  ? `${weather.humidity}%`
-                  : "—"}
-              </span>
-            </div>
-          </div>
-
-          <div className="range-bar">
-            <div className="range-labels">
-              <span>
-                MIN{" "}
-                {weather
-                  ? `${Math.round(
-                      weather.minTemperature
-                    )}°`
-                  : "—"}
-              </span>
-
-              <span>
-                MAX{" "}
-                {weather
-                  ? `${Math.round(
-                      weather.maxTemperature
-                    )}°`
-                  : "—"}
-              </span>
-            </div>
-
-            <div className="range-track">
-              {weather && (
-                <div className="range-fill" />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* SUN PANEL */}
-        <div className="panel sun-panel">
-          <div className="panel-title">
-            Day Arc
-          </div>
-
-          <SunArc
-            sunrise={weather?.sunrise}
-            sunset={weather?.sunset}
-          />
-
-          <div className="sun-times">
-            <div>
-              <span className="sub-label">
-                Sunrise
-              </span>
-
-              <span className="sub-value">
-                {weather
-                  ? unixToTime(weather.sunrise)
-                  : "—"}
-              </span>
-            </div>
-
-            <div>
-              <span className="sub-label">
-                Sunset
-              </span>
-
-              <span className="sub-value">
-                {weather
-                  ? unixToTime(weather.sunset)
-                  : "—"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* GAUGES */}
-      <div className="gauges">
-        {/* WIND */}
-        <div className="panel gauge-panel">
-          <div className="gauge-name">
-            Wind
-          </div>
-
-          <div className="compass-wrap">
-            <svg viewBox="0 0 96 96">
-              <circle
-                cx="48"
-                cy="48"
-                r="42"
-                className="ring-bg"
-                strokeWidth="1"
+              <Gauge
+                value={
+                  weather
+                    ? weather.humidity
+                    : "—"
+                }
+                unit="%"
+                fraction={
+                  weather
+                    ? weather.humidity / 100
+                    : 0
+                }
+                color="#5B9FA8"
               />
 
-              <text
-                x="48"
-                y="12"
-                textAnchor="middle"
-                className="compass-text"
-              >
-                N
-              </text>
+              <p>
+                {weather
+                  ? weather.humidity < 40
+                    ? "Dry"
+                    : weather.humidity < 70
+                    ? "Comfortable"
+                    : "Humid"
+                  : "—"}
+              </p>
 
-              <text
-                x="48"
-                y="90"
-                textAnchor="middle"
-                className="compass-text"
-              >
-                S
-              </text>
+            </div>
 
-              <text
-                x="8"
-                y="51"
-                textAnchor="middle"
-                className="compass-text"
-              >
-                W
-              </text>
 
-              <text
-                x="88"
-                y="51"
-                textAnchor="middle"
-                className="compass-text"
-              >
-                E
-              </text>
+            {/* WIND */}
 
-              <g
-                className="needle"
-                style={{
-                  transform: `rotate(${
-                    weather?.windDirection || 0
-                  }deg)`
-                }}
-              >
-                <line
-                  x1="48"
-                  y1="48"
-                  x2="48"
-                  y2="16"
-                  stroke="#D9784F"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
+            <div className="detail-card">
 
-                <line
-                  x1="48"
-                  y1="48"
-                  x2="48"
-                  y2="72"
-                  stroke="#536278"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+              <div className="card-label">
+                Wind
+              </div>
 
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="3.5"
-                  fill="#C9A24B"
-                />
-              </g>
-            </svg>
+              <div className="wind-display">
+
+                <div
+                  className="wind-arrow"
+                  style={{
+                    transform: `rotate(${
+                      weather?.windDirection || 0
+                    }deg)`
+                  }}
+                >
+                  ↑
+                </div>
+
+                <div>
+
+                  <strong>
+                    {weather
+                      ? weather.windSpeed
+                      : "—"}
+                  </strong>
+
+                  <span>
+                    m/s
+                  </span>
+
+                </div>
+
+              </div>
+
+              <p>
+                {weather
+                  ? degToCompass(
+                      weather.windDirection
+                    )
+                  : "—"}
+              </p>
+
+            </div>
+
+
+            {/* PRESSURE */}
+
+            <div className="detail-card">
+
+              <div className="card-label">
+                Pressure
+              </div>
+
+              <Gauge
+                value={
+                  weather
+                    ? weather.pressure
+                    : "—"
+                }
+                unit="hPa"
+                fraction={
+                  pressureFraction
+                }
+                color="#D5A653"
+              />
+
+              <p>
+                Atmospheric pressure
+              </p>
+
+            </div>
+
+
+            {/* CLOUDINESS */}
+
+            <div className="detail-card">
+
+              <div className="card-label">
+                Cloudiness
+              </div>
+
+              <Gauge
+                value={
+                  weather
+                    ? weather.cloudiness
+                    : "—"
+                }
+                unit="%"
+                fraction={
+                  weather
+                    ? weather.cloudiness / 100
+                    : 0
+                }
+                color="#7DA9C4"
+              />
+
+              <p>
+                {weather
+                  ? weather.cloudiness < 20
+                    ? "Mostly clear"
+                    : weather.cloudiness < 60
+                    ? "Partly cloudy"
+                    : "Cloudy"
+                  : "—"}
+              </p>
+
+            </div>
+
+
+            {/* VISIBILITY */}
+
+            <div className="detail-card">
+
+              <div className="card-label">
+                Visibility
+              </div>
+
+              <Gauge
+                value={
+                  weather
+                    ? metersToKm(
+                        weather.visibility
+                      )
+                    : "—"
+                }
+                unit="km"
+                fraction={
+                  visibilityFraction
+                }
+                color="#D98268"
+              />
+
+              <p>
+                Distance you can see
+              </p>
+
+            </div>
+
           </div>
 
-          <div className="compass-dir">
-            {weather
-              ? degToCompass(
-                  weather.windDirection
-                )
-              : "—"}
-          </div>
+        </section>
 
-          <div className="gauge-readout">
-            {weather
-              ? weather.windSpeed
-              : "—"}{" "}
-            <small>m/s</small>
-          </div>
-        </div>
 
-        {/* HUMIDITY */}
-        <div className="panel gauge-panel">
-          <div className="gauge-name">
-            Humidity
-          </div>
+        {/* SUNRISE / SUNSET */}
 
-          <Gauge
-            value={weather ? weather.humidity : "—"}
-            fraction={
-              weather
-                ? weather.humidity / 100
-                : 0
-            }
-            unit="%"
-          />
-        </div>
+        {weather && (
+          <section className="sun-section">
 
-        {/* PRESSURE */}
-        <div className="panel gauge-panel">
-          <div className="gauge-name">
-            Pressure
-          </div>
+            <div className="sun-card">
 
-          <Gauge
-            value={weather ? weather.pressure : "—"}
-            fraction={pressureFraction}
-            unit="hPa"
-            colorClass="brass-ring"
-          />
-        </div>
+              <div>
 
-        {/* CLOUDINESS */}
-        <div className="panel gauge-panel">
-          <div className="gauge-name">
-            Cloudiness
-          </div>
+                <span className="sun-label">
+                  SUNRISE
+                </span>
 
-          <Gauge
-            value={
-              weather ? weather.cloudiness : "—"
-            }
-            fraction={
-              weather
-                ? weather.cloudiness / 100
-                : 0
-            }
-            unit="%"
-          />
-        </div>
+                <strong>
+                  {unixToTime(
+                    weather.sunrise
+                  )}
+                </strong>
 
-        {/* VISIBILITY */}
-        <div className="panel gauge-panel">
-          <div className="gauge-name">
-            Visibility
-          </div>
+              </div>
 
-          <Gauge
-            value={
-              weather
-                ? metersToKm(weather.visibility)
-                : "—"
-            }
-            fraction={visibilityFraction}
-            unit="km"
-            colorClass="coral-ring"
-          />
-        </div>
+
+              <div className="sun-line">
+
+                <span className="sun-circle">
+                  ☀
+                </span>
+
+              </div>
+
+
+              <div className="sun-right">
+
+                <span className="sun-label">
+                  SUNSET
+                </span>
+
+                <strong>
+                  {unixToTime(
+                    weather.sunset
+                  )}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </section>
+        )}
+
+
+        <footer>
+          Weather data provided by OpenWeather
+        </footer>
+
       </div>
-
-      <footer>
-        Instrument readout · updates on fetch · not
-        for navigation use
-      </footer>
-    </div>
+    </main>
   );
 }
 
 export default App;
+
